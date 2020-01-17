@@ -1,47 +1,52 @@
 <nb-layout>
 
   <nb-layout-header fixed>
-  <!-- Insert header here -->
+    <!-- Insert header here -->
     Eagle-I
   </nb-layout-header>
 
   <nb-layout-column>
 
     <!-- <h1>File Upload</h1> -->
-    <input 
-        style="display: none"
-        type ="file" (change) = "onFileSelected($event)"
-        #fileInput>
-   
-      <div>
-        <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
-        [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
-        [videoOptions]="videoOptions"
-        [imageQuality]="1"
-        (cameraSwitched)="cameraWasSwitched($event)"
-        (initError)="handleInitError($event)"
-            ></webcam>
+    <input style="display: none" type="file" (change)="onFileSelected($event)" #fileInput>
 
-        <br>
-            <button nbButton status = "primary" class="actionBtn" (click)="triggerSnapshot();">Click Photo</button>
-            &nbsp;    
-        <span>
-            <button nbButton status = "primary" type="button" (click)= "fileInput.click()">Gallery</button>
-            &nbsp;
-        </span>
-        <span>
-            <button nbButton status = "success" type="button" (click) ="onUpload()">Upload</button>
-        </span>
-      
+    <!-- <h3>Angular 7 Image Preview before Upload:</h3> -->
+    <!-- <span style="color:red;" *ngIf="message">{{message}}</span> -->
+    <img [src]="imgURL" height="200" *ngIf="imgURL">
+
+    <div>
+      <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)"
+        *ngIf="showWebcam" [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
+        [videoOptions]="videoOptions" [imageQuality]="1" (cameraSwitched)="cameraWasSwitched($event)"
+        (initError)="handleInitError($event)"></webcam>
+
+        
+      <br>
+      <button nbButton status="primary" class="actionBtn" (click)="triggerSnapshot();">Click Photo</button>
+      &nbsp;
+      <span>
+        <button nbButton status="primary" type="button">
+          <input  #file type="file" accept='image/*' (change)="preview(file.files)" />
+
+
+        </button>
+
+
+        &nbsp;
+      </span>
+      <span>
+        <button nbButton status="success" type="button" (click)="onUpload()">Upload</button>
+      </span>
+
     </div>
-      <div #snap class="snapshot" *ngIf="webcamImage">
-        <h2>Selected Image</h2>
-        <img [src]="camImage"/>
-      </div>
+    <div #snap class="snapshot" *ngIf="webcamImage">
+      <h2>Selected Image</h2>
+      <img [src]="camImage" />
+    </div>
   </nb-layout-column>
 
   <nb-layout-footer fixed>
-  <!-- Insert footer here -->
+    <!-- Insert footer here -->
   </nb-layout-footer>
 
 </nb-layout>
