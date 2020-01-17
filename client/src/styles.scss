@@ -1,8 +1,9 @@
-@import 'themes';
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
 
-@import '~@nebular/theme/styles/globals';
-
-@include nb-install() {
-  @include nb-theme-global();
-};
-/* You can add global styles to this file, and also import other style files */
+main {
+  flex: 1 0 auto;
+}

@@ -70,6 +70,7 @@ export class AppComponent implements OnInit {
     reader.onload = (event) => {
       this.imgURL = reader.result;
       this.camImage = this.imgURL;
+      this.photoClicked = true;
     };
   }
 
@@ -125,12 +126,6 @@ export class AppComponent implements OnInit {
 
   public get nextWebcamObservable(): Observable<boolean | string> {
     return this.nextWebcam.asObservable();
-  }
-
-  onFileSelected(event) {
-    this.camImage = false;
-    this.selectedFile = <File>event.target.files[0];
-    this.camImage = this.selectedFile.name;
   }
 
   onUpload() {
