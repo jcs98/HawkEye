@@ -1,13 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { HttpClient, HttpEventType } from '@angular/common/http'
-// import { viewClassName } from '@angular/compiler';
-// import 
-// import {Subject} from 'rxjs/Subject';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpEventType } from '@angular/common/http';
+import { Observable, Subject } from 'rxjs';
 import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
-import { Subject } from 'rxjs';
-import { saveAs } from "file-saver";
-import { stringify } from 'querystring';
 
 @Component({
   selector: 'app-root',
@@ -16,26 +10,32 @@ import { stringify } from 'querystring';
 })
 export class AppComponent implements OnInit {
 
-  title = 'Scorpion-App';
-  selectedFile: File = null;
+  public title = 'HawkEye';
+  public selectedFile: File = null;
   constructor(private http: HttpClient) { }
 
+  public photoClicked = false;
+
+  public elevation = '--';
   public showWebcam = true;
   public allowCameraSwitch = true;
   public multipleWebcamsAvailable = false;
   public camImage = null;
-  public videoOptions: MediaTrackConstraints = {
-
-  };
+  public videoOptions: MediaTrackConstraints = {};
 
   public errors: WebcamInitError[] = [];
   public deviceId: string;
   public webcamImage: WebcamImage = null;
 
+  public imagePath;
+  public imgURL: any;
+  public message: string;
+
   public trigger: Subject<void> = new Subject<void>();
   private nextWebcam: Subject<boolean | string> = new Subject<boolean | string>();
 
-
+  public height: number;
+  public width: number;
 
   public ngOnInit(): void {
     WebcamUtil.getAvailableVideoInputs()
@@ -45,63 +45,57 @@ export class AppComponent implements OnInit {
     window.addEventListener('beforeinstallprompt', event => {
       // this.promptEvent = event;
     });
+
+    this.height = window.innerHeight;
+    this.width = window.innerWidth;
+
   }
-  public imagePath;
-  imgURL: any;
-  public message: string;
 
   preview(files) {
-    if (files.length === 0)
-      return;
-
-    var mimeType = files[0].type;
-    if (mimeType.match(/image\/*/) == null) {
-      this.message = "Only images are supported.";
+    if (files.length === 0) {
       return;
     }
 
-    var reader = new FileReader();
+    const mimeType = files[0].type;
+    if (mimeType.match(/image\/*/) == null) {
+      this.message = 'Only images are supported.';
+      return;
+    }
+
+    const reader = new FileReader();
     this.imagePath = files;
     reader.readAsDataURL(files[0]);
     this.selectedFile = files[0];
-    // console.log(event)
 
-    reader.onload = (_event) => {
+    reader.onload = (event) => {
       this.imgURL = reader.result;
       this.camImage = this.imgURL;
-    }
+    };
   }
 
   public triggerSnapshot(): void {
     this.trigger.next();
-    console.log(this.webcamImage)
+    console.log(this.webcamImage);
     this.selectedFile = <File>this.dataURItoBlob(this.webcamImage.imageAsDataUrl);
     this.camImage = this.webcamImage.imageAsDataUrl;
-    // document.getElementsByTagName('img')[0].toDataURL();
-
+    this.photoClicked = true;
   }
 
+  public reset() {
+    this.photoClicked = false;
+  }
 
-  //////////////////////////
   public dataURItoBlob(dataURI) {
-    // convert base64 to raw binary data held in a string
-    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-    var byteString = atob(dataURI.split(',')[1]);
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
-    // separate out the mime component
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-    // write the bytes of the string to an ArrayBuffer
-    var ab = new ArrayBuffer(byteString.length);
-    var ia = new Uint8Array(ab);
-    for (var i = 0; i < byteString.length; i++) {
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: mimeString });
-
-
   }
-  /////////////
 
   public toggleWebcam(): void {
     this.showWebcam = !this.showWebcam;
@@ -112,17 +106,12 @@ export class AppComponent implements OnInit {
   }
 
   public showNextWebcam(directionOrDeviceId: boolean | string): void {
-    // true => move forward through devices
-    // false => move backwards through devices
-    // string => move to device with given deviceId
     this.nextWebcam.next(directionOrDeviceId);
   }
 
   public handleImage(webcamImage: WebcamImage): void {
-    console.info('received webcam image', webcamImage);
+    console.log('received webcam image', webcamImage);
     this.webcamImage = webcamImage;
-
-    // console.log(this.selectedFile)
   }
 
   public cameraWasSwitched(deviceId: string): void {
@@ -138,25 +127,19 @@ export class AppComponent implements OnInit {
     return this.nextWebcam.asObservable();
   }
 
-
-
-
   onFileSelected(event) {
     this.camImage = false;
     this.selectedFile = <File>event.target.files[0];
-    // console.log(event)
-    this.camImage = this.selectedFile.name
-    // console.log(this.selectedFile);
-
-    // console.log(btoa(this.selectedFile.toString()))
+    this.camImage = this.selectedFile.name;
   }
 
   onUpload() {
     const fd = new FormData();
-    console.log(this.selectedFile)
+    console.log(this.selectedFile);
 
-    fd.append('image', this.selectedFile)
-    console.log(fd)
+    fd.append('image', this.selectedFile);
+    console.log(fd);
+    this.elevation = '--';
     this.http.post('http://jarvis.somecha.in:9002/handle_data', fd, {
       reportProgress: true,
       observe: 'events'
@@ -165,15 +148,15 @@ export class AppComponent implements OnInit {
         if (event.type === HttpEventType.UploadProgress) {
           console.log('Upload Progress: ' + Math.round(event.loaded / event.total * 100) + '%')
         } else if (event.type === HttpEventType.Response) {
-          console.log(event.body['img']);
+          console.log(event.body);
           const base64img = event.body['img'].toString().split('\n').join('');
-          // const base64img = "iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAIAAAC6s0uzAAADk0lEQVR4nO3BAQEAAACCIP+vbkhAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwaBKyAAEKyjCgAAAAAElFTkSuQmCC" 
-          this.camImage = "data:Image/png;base64," + base64img
+          this.elevation = event.body['elevation'];
+          this.camImage = 'data:Image/png;base64,' + base64img;
           this.webcamImage = this.camImage;
         }
       }
-      )
-    this.selectedFile = null
+      );
+    this.selectedFile = null;
 
   }
 }

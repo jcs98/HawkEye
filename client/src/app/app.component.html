@@ -1,52 +1,18 @@
-<nb-layout>
+<h1>HawkEye</h1>
 
-  <nb-layout-header fixed>
-    <!-- Insert header here -->
-    Eagle-I
-  </nb-layout-header>
+<h1>{{elevation}}</h1>
 
-  <nb-layout-column>
+<webcam [height]="height" [width]="width" [trigger]="triggerObservable" (imageCapture)="handleImage($event)"
+  *ngIf="!photoClicked" [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
+  [videoOptions]="videoOptions" [imageQuality]="1" (cameraSwitched)="cameraWasSwitched($event)"
+  (initError)="handleInitError($event)">
+</webcam>
 
-    <!-- <h1>File Upload</h1> -->
-    <input style="display: none" type="file" (change)="onFileSelected($event)" #fileInput>
+<img [height]="height" [width]="width" [src]="camImage" *ngIf="photoClicked" />
 
-    <!-- <h3>Angular 7 Image Preview before Upload:</h3> -->
-    <!-- <span style="color:red;" *ngIf="message">{{message}}</span> -->
-    <img [src]="imgURL" height="200" *ngIf="imgURL">
+<button *ngIf="photoClicked" status="success" type="button" (click)="reset()">Reset</button>
+<button *ngIf="!photoClicked" status="primary" class="actionBtn" (click)="triggerSnapshot();">Click Photo</button>
+<input *ngIf="!photoClicked" #file type="file" accept='image/*' (change)="preview(file.files)" />
+<button *ngIf="photoClicked" status="success" type="button" (click)="onUpload()">Upload</button>
 
-    <div>
-      <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)"
-        *ngIf="showWebcam" [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
-        [videoOptions]="videoOptions" [imageQuality]="1" (cameraSwitched)="cameraWasSwitched($event)"
-        (initError)="handleInitError($event)"></webcam>
-
-        
-      <br>
-      <button nbButton status="primary" class="actionBtn" (click)="triggerSnapshot();">Click Photo</button>
-      &nbsp;
-      <span>
-        <button nbButton status="primary" type="button">
-          <input  #file type="file" accept='image/*' (change)="preview(file.files)" />
-
-
-        </button>
-
-
-        &nbsp;
-      </span>
-      <span>
-        <button nbButton status="success" type="button" (click)="onUpload()">Upload</button>
-      </span>
-
-    </div>
-    <div #snap class="snapshot" *ngIf="webcamImage">
-      <h2>Selected Image</h2>
-      <img [src]="camImage" />
-    </div>
-  </nb-layout-column>
-
-  <nb-layout-footer fixed>
-    <!-- Insert footer here -->
-  </nb-layout-footer>
-
-</nb-layout>
+<h2>Team Scorpion | SIH</h2>
