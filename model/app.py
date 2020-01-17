@@ -91,6 +91,25 @@ def generateSky(img, model):
     # torch.cuda.set_device(gpu)    
     test(model, loader, gpu)
 
+def angle_of_elevation(mask_path):
+    image = Image.open(mask_path)
+    img_array = np.array(image)
+
+    image_height = img_array.shape[0]
+
+    lowest = float('inf')
+
+    for col in img_array.T:
+        try:
+            index = list(col)[::-1].index(True)
+            if(index < lowest):
+                lowest = index
+        except ValueError:
+            continue
+
+    angle_of_elevation = (lowest / image_height) * 90
+    return angle_of_elevation
+
 if __name__=="__main__":
     from constants import HRNET_MODEL as MODEL
     model = loadModel(MODEL)
