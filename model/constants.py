@@ -1,4 +1,5 @@
-RES_PATH = "res.png"
+REQ_FILE_NAME = "temp_file.jpg"
+RES_FILE_NAME = "temp_file.png"
 
 HRNET_MODEL = {
     "encoder_weights": "ade20k-hrnetv2-c1/encoder_epoch_30.pth",

@@ -10,8 +10,12 @@ from utils import colorEncode
 from lib.nn import user_scattered_collate, async_copy_to
 from lib.utils import as_numpy
 
-from constants import RES_PATH, DATASET_CONFIG, colors
+from constants import REQ_FILE_NAME, RES_FILE_NAME, DATASET_CONFIG, colors
 
+import io
+import base64
+from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 
 cwd = os.getcwd()
 colors = np.array(colors).astype(np.uint8)
@@ -21,7 +25,7 @@ def save_img(img, pred):
     pred[pred == 2] = 1
     pred = np.int32(pred)
     res_img = colorEncode(pred, colors).astype(np.uint8)
-    Image.fromarray(res_img).save(os.path.join(cwd, RES_PATH))
+    Image.fromarray(res_img).save(os.path.join(cwd, RES_FILE_NAME))
 
 def test(segmentation_module, loader, gpu):
     segmentation_module.eval()
@@ -92,8 +96,8 @@ def generateSky(img, model):
     test(model, loader, gpu)
 
 def angle_of_elevation(mask_path):
-    image = Image.open(mask_path)
-    img_array = np.array(image)
+    image = Image.open(os.path.join(cwd, mask_path))
+    img_array = np.array(image)[:,:,0]
 
     image_height = img_array.shape[0]
 
@@ -101,23 +105,42 @@ def angle_of_elevation(mask_path):
 
     for col in img_array.T:
         try:
-            index = list(col)[::-1].index(True)
+            index = list(col)[::-1].index(255)
             if(index < lowest):
                 lowest = index
         except ValueError:
             continue
 
-    angle_of_elevation = (lowest / image_height) * 90
-    return angle_of_elevation
+    angle = (lowest / image_height) * 90
+    return str(angle)
 
 if __name__=="__main__":
+    import time
     from constants import HRNET_MODEL as MODEL
     model = loadModel(MODEL)
 
-    img = "test_img.jpg"
+    app = Flask(__name__)
+    cors = CORS(app)
+    app.config['CORS_HEADERS'] = 'image'
 
-    import time
-    start = time.time()
-    generateSky(img, model)
-    end = time.time()
-    print(end-start)
+    @app.route('/handle_data', methods=['POST'])
+    @cross_origin()
+    def handle_data():
+        print("Request received, processing...")
+        req_file = request.files['image']
+        req_file.save(REQ_FILE_NAME)
+
+        start = time.time()
+        generateSky(REQ_FILE_NAME, model)
+        end = time.time()
+        print("Time taken:", end-start)
+
+        img = Image.open(RES_FILE_NAME, mode='r')
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('ascii')
+        return jsonify({'img': encoded_img, 'elevation': angle_of_elevation(RES_FILE_NAME)})
+
+    app.secret_key = 'mysecret'
+    app.debug = True
+    app.run(host='0.0.0.0', port="8000")
