@@ -1,0 +1,5 @@
+__pycache__
+*.pyc
+ade20k-hrnetv2-c1
+*.jpg
+*.png
