@@ -38,14 +38,14 @@ def test(segmentation_module, loader, gpu):
 
         with torch.no_grad():
             scores = torch.zeros(1, DATASET_CONFIG["num_class"], segSize[0], segSize[1])
-            # scores = async_copy_to(scores, gpu)
+            scores = async_copy_to(scores, gpu)
 
             for img in img_resized_list:
                 feed_dict = batch_data.copy()
                 feed_dict['img_data'] = img
                 del feed_dict['img_ori']
                 del feed_dict['info']
-                # feed_dict = async_copy_to(feed_dict, gpu)
+                feed_dict = async_copy_to(feed_dict, gpu)
 
                 # forward pass
                 pred_tmp = segmentation_module(feed_dict, segSize=segSize)
@@ -71,6 +71,7 @@ def loadModel(model):
     crit = nn.NLLLoss(ignore_index=-1)
 
     segmentation_module = SegmentationModule(net_encoder, net_decoder, crit)
+    segmentation_module.cuda()
     return segmentation_module
 
 def getLoader(imgs):
@@ -92,7 +93,7 @@ def generateSky(img, model):
     img = [os.path.join(cwd, img)]
     loader = getLoader(img)
     gpu = 0
-    # torch.cuda.set_device(gpu)    
+    torch.cuda.set_device(gpu)    
     test(model, loader, gpu)
 
 def angle_of_elevation(mask_path):
@@ -143,4 +144,5 @@ if __name__=="__main__":
 
     app.secret_key = 'mysecret'
     app.debug = True
-    app.run(host='0.0.0.0', port="8000")
+    app.run(host='0.0.0.0', port="9002")
+    # app.run(host='0.0.0.0', port='9002', ssl_context='adhoc')
