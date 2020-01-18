@@ -4,13 +4,13 @@ body{
   overflow: hidden;
 }
 webcam{
-  z-index: -20;
+  z-index: 15;
   // width: 100vw;
 }
 video{
   width: 100vw;
   height: 100vh;
-  z-index: -5;
+  z-index: 15;
 }
 
 .nav-wrapper{
@@ -19,7 +19,9 @@ video{
 
 .elevation{
   text-align: center;
-  width: 100vw;
+  width: 80vw;
+  float: right;
+  background-color: #ffffff28;
   position: absolute;
   z-index: 15;
 }
