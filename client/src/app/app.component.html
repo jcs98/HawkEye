@@ -1,19 +1,17 @@
 <header>
   <nav>
-    <div class="nav-wrapper reds">
-      <a href="#" class="brand-logo">HawkEye</a>
+    <div class="nav-wrapper red">
+      <a href="#" class="brand-logo">HAWK EYE</a>
     </div>
   </nav>
 </header>
 
 <main>
-  <div class="elevation">
-    <!-- <div class="container"> -->
-    <h3 *ngIf="!photoClicked">--</h3>
-    <h3 *ngIf="photoClicked">{{elevation}}</h3>
-    <h6>ELEVATION</h6>
-
+  <div *ngIf="photoUploaded" class="elevation">
+    <h3>{{elevation}} &#176;</h3>
+    <h6>SKY ELEVATION</h6>
   </div>
+
 
   <webcam [height]="height" [width]="width" [trigger]="triggerObservable" (imageCapture)="handleImage($event)"
     *ngIf="!photoClicked" [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
@@ -51,10 +49,10 @@
   <!-- </div> -->
 </main>
 
-<footer class="page-footer">
+<footer class="page-footer red">
   <div class="footer-copyright">
     <div class="container">
-      Team Scorpion
+      TEAM SCORPION
       <a class="grey-text text-lighten-4 right" href="#!">SIH 2020</a>
     </div>
   </div>

@@ -13,22 +13,28 @@ video{
   z-index: 15;
 }
 
+main{
+  padding-bottom: 60px;
+}
+
 .nav-wrapper{
   z-index: 15;
 }
 
 .elevation{
   text-align: center;
-  width: 80vw;
-  float: right;
+  // float: right;
+  width: 100vw;
   background-color: #ffffff28;
   position: absolute;
   z-index: 15;
 }
+
 button{
   z-index: 15;
   top: 70%;
   position: absolute;
+  text-align: center;
 }
 // .file-field,input{
 //   display: inline-block;
@@ -57,10 +63,12 @@ button{
 // }
 
 footer{
-  position: absolute;
+  position: fixed;
   width: 100%;
   bottom: 0;
   z-index: 15;
+  margin-top: 60px;
+  height: 60px;
 }
 .buttons{
   position: absolute;
@@ -68,6 +76,7 @@ footer{
   bottom: 10vh;
   z-index: 15;
   padding-left: 2 rem;
+  text-align: center;
 
 }
 .input-field{
@@ -78,4 +87,8 @@ button{margin-left:1 rem;
 }
 .btn-floating{
   margin-left:10px;
+}
+
+.camera-switch {
+  display: none;
 }

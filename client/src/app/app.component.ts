@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   public photoClicked = false;
+  public photoUploaded = false;
 
   public elevation = '--';
   public showWebcam = true;
@@ -84,6 +85,7 @@ export class AppComponent implements OnInit {
 
   public reset() {
     this.photoClicked = false;
+    this.photoUploaded = false;
   }
 
   public dataURItoBlob(dataURI) {
@@ -129,9 +131,10 @@ export class AppComponent implements OnInit {
   }
 
   onUpload() {
+    
     const fd = new FormData();
     console.log(this.selectedFile);
-
+    
     fd.append('image', this.selectedFile);
     console.log(fd);
     this.elevation = '--';
@@ -139,19 +142,20 @@ export class AppComponent implements OnInit {
       reportProgress: true,
       observe: 'events'
     })
-      .subscribe(event => {
-        if (event.type === HttpEventType.UploadProgress) {
-          console.log('Upload Progress: ' + Math.round(event.loaded / event.total * 100) + '%')
-        } else if (event.type === HttpEventType.Response) {
-          console.log(event.body);
-          const base64img = event.body['img'].toString().split('\n').join('');
-          this.elevation = event.body['elevation'];
-          this.camImage = 'data:Image/png;base64,' + base64img;
-          this.webcamImage = this.camImage;
-        }
+    .subscribe(event => {
+      if (event.type === HttpEventType.UploadProgress) {
+        console.log('Upload Progress: ' + Math.round(event.loaded / event.total * 100) + '%')
+      } else if (event.type === HttpEventType.Response) {
+        console.log(event.body);
+        const base64img = event.body['img'].toString().split('\n').join('');
+        this.elevation = event.body['elevation'];
+        this.camImage = 'data:Image/png;base64,' + base64img;
+        this.webcamImage = this.camImage;
       }
-      );
+    }
+    );
     this.selectedFile = null;
-
+    this.photoUploaded = true;
+    
   }
 }
