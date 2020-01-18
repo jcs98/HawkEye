@@ -113,6 +113,9 @@ def angle_of_elevation(mask_path):
             continue
 
     angle = (lowest / image_height) * 90
+
+    if angle != "inf":
+        angle = round(angle, 4)
     return str(angle)
 
 if __name__=="__main__":

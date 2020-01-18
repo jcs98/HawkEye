@@ -38,7 +38,7 @@
       </span>
     </div>
   </div>
-  <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="photoClicked" (click)="onUpload()">
+  <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="photoClicked && !photoUploaded" (click)="onUpload()">
     <i class="large material-icons">check</i></button>
   </div>
 
