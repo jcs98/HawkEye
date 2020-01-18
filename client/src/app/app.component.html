@@ -19,7 +19,7 @@
     (initError)="handleInitError($event)">
   </webcam>
 
-  <img [height]="height" [width]="width" [src]="camImage" *ngIf="photoClicked" />
+  <img style="height: auto;" [width]="width" [src]="camImage" *ngIf="photoClicked" />
   <div class="buttons">
 
   <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="photoClicked" (click)="reset()"><i
