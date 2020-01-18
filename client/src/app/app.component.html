@@ -1,16 +1,19 @@
 <header>
   <nav>
-    <div class="nav-wrapper red">
+    <div class="nav-wrapper reds">
       <a href="#" class="brand-logo">HawkEye</a>
     </div>
   </nav>
 </header>
 
 <main>
-  <!-- <div class="container"> -->
-  <h3 *ngIf="!photoClicked">--</h3>
-  <h3 *ngIf="photoClicked">{{elevation}}</h3>
-  <h6>ELEVATION</h6>
+  <div class="elevation">
+    <!-- <div class="container"> -->
+    <h3 *ngIf="!photoClicked">--</h3>
+    <h3 *ngIf="photoClicked">{{elevation}}</h3>
+    <h6>ELEVATION</h6>
+
+  </div>
 
   <webcam [height]="height" [width]="width" [trigger]="triggerObservable" (imageCapture)="handleImage($event)"
     *ngIf="!photoClicked" [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
@@ -19,6 +22,7 @@
   </webcam>
 
   <img [height]="height" [width]="width" [src]="camImage" *ngIf="photoClicked" />
+  <div class="buttons">
 
   <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="photoClicked" (click)="reset()"><i
       class="large material-icons">refresh</i></button>
@@ -26,28 +30,32 @@
   <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="!photoClicked"
     (click)="triggerSnapshot();"><i class="large material-icons">camera_alt</i></button>
 
-    <div *ngIf="!photoClicked" class="file-field input-field">
-      <div class="btn-floating btn-large waves-effect waves-light red">
-        <i class="large material-icons">insert_photo</i>
-        
-        <input #file type="file"
-          accept='image/*' (change)="preview(file.files)" />
-      </div>
-    </div>
 
-    <!-- <input *ngIf="!photoClicked" #file type="file"
+  <div class=" input-field">
+    <div class="btn-floating btn-large waves-effect waves-light red file-field" *ngIf="!photoClicked">
+      <span>
+        <i class="large material-icons ">insert_photo</i>
+
+        <input #file type="file" accept='image/*' (change)="preview(file.files)" />
+      </span>
+    </div>
+  </div>
+  <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="photoClicked" (click)="onUpload()">
+    <i class="large material-icons">check</i></button>
+  </div>
+
+  <!-- <input *ngIf="!photoClicked" #file type="file"
     accept='image/*' (change)="preview(file.files)" /> -->
 
-  <button class="btn-floating btn-large waves-effect waves-light red" *ngIf="photoClicked" (click)="onUpload()"><i
-      class="large material-icons">check</i></button>
+
   <!-- </div> -->
 </main>
 
-<!-- <footer class="page-footer">
+<footer class="page-footer">
   <div class="footer-copyright">
     <div class="container">
       Team Scorpion
       <a class="grey-text text-lighten-4 right" href="#!">SIH 2020</a>
     </div>
   </div>
-</footer> -->
+</footer>
