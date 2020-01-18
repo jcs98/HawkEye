@@ -1,7 +1,7 @@
 {
   "name": "HAWK EYE",
   "short_name": "HAWK EYE",
-  "theme_color": "#1976d2",
+  "theme_color": "red",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "/",
